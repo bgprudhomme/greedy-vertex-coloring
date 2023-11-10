@@ -10,7 +10,7 @@ public class App {
 		Matrix m = randGraph(6, 0.5);
 		System.out.println(m);
 		
-		int[] coloring = color_ff(m);
+		int[] coloring = color_ffd(m);
 		
 		System.out.println(Arrays.toString(coloring));
 		System.out.println(legalColoring(m, coloring));
@@ -85,6 +85,54 @@ public class App {
 		
 		while(!uncolored.isEmpty()) {
 			i = uncolored.remove(rand.nextInt(uncolored.size()));
+			
+			neighborColors = new HashSet<Integer>();
+			for(int j : graph.neighbors(i)) {
+				neighborColors.add(result[j]);
+			}
+			
+			nextColor = 1;
+			while(neighborColors.contains(nextColor))
+				nextColor++;
+			
+			result[i] = nextColor;
+		}
+		
+		return result;
+	}
+	
+	public static int[] color_ffa(Matrix graph) {
+		int[] result = new int[graph.size()];
+		Random rand = new Random();
+		
+		int nextColor;
+		HashSet<Integer> neighborColors;
+		
+		for(int i=0; i<graph.size(); i++) {
+			
+			neighborColors = new HashSet<Integer>();
+			for(int j : graph.neighbors(i)) {
+				neighborColors.add(result[j]);
+			}
+			
+			nextColor = 1;
+			while(neighborColors.contains(nextColor))
+				nextColor++;
+			
+			result[i] = nextColor;
+		}
+		
+		return result;
+	}
+	
+	public static int[] color_ffd(Matrix graph) {
+		int[] result = new int[graph.size()];
+		Random rand = new Random();
+		
+		int nextColor;
+		HashSet<Integer> neighborColors;
+		
+		for(int i=graph.size()-1; i>=0; i--) {
 			
 			neighborColors = new HashSet<Integer>();
 			for(int j : graph.neighbors(i)) {
