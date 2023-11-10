@@ -7,11 +7,12 @@ public class App {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Matrix m = randGraph(6, 0.2);
+		Matrix m = randGraph(6, 0.5);
 		System.out.println(m);
 		
-		int[] coloring = {0, 0, 0, 1, 1, 1};
+		int[] coloring = color_ff(m);
 		
+		System.out.println(Arrays.toString(coloring));
 		System.out.println(legalColoring(m, coloring));
 		
 	}
@@ -70,8 +71,34 @@ public class App {
 		return true;
 	}
 	
-//	public static int[] optimalColoring(Matrix graph) {
-//		
-//	}
-
+	public static int[] color_ff(Matrix graph) {
+		int[] result = new int[graph.size()];
+		Random rand = new Random();
+		
+		ArrayList<Integer> uncolored = new ArrayList<Integer>();
+		for(int i=0; i<graph.size(); i++)
+			uncolored.add(i);
+		
+		int i;
+		int nextColor;
+		HashSet<Integer> neighborColors;
+		
+		while(!uncolored.isEmpty()) {
+			i = uncolored.remove(rand.nextInt(uncolored.size()));
+			
+			neighborColors = new HashSet<Integer>();
+			for(int j : graph.neighbors(i)) {
+				neighborColors.add(result[j]);
+			}
+			
+			nextColor = 1;
+			while(neighborColors.contains(nextColor))
+				nextColor++;
+			
+			result[i] = nextColor;
+		}
+		
+		return result;
+	}
+	
 }

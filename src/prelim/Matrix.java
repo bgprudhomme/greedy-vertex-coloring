@@ -1,5 +1,7 @@
 package prelim;
 
+import java.util.ArrayList;
+
 public class Matrix {
 
 	private int n;
@@ -13,6 +15,15 @@ public class Matrix {
 				entries[i][j] = 0;
 			}
 		}
+	}
+	
+	public ArrayList<Integer> neighbors(int i) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		for(int j=0; j<n; j++) {
+			if(get(i, j) == 1)
+				result.add(j);
+		}
+		return result;
 	}
 	
 	public int size() {
@@ -51,7 +62,7 @@ public class Matrix {
 		String result = "";
 		for(int i=0; i<n; i++) {
 			for(int j=0; j<n; j++) {
-				result += entries[i][j];
+				result += entries[i][j] + " ";
 			}
 			result += "\n";
 		}
