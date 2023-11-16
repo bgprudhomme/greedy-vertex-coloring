@@ -26,8 +26,26 @@ public class Matrix {
 		return result;
 	}
 	
+	public int degree(int i) {
+		return neighbors(i).size();
+	}
+	
 	public int size() {
 		return n;
+	}
+	
+	public ArrayList<Integer> degreeSortedNodes() {
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		int curDeg = 0;
+		while(result.size() < n) {
+			for(int i=0; i<n; i++) {
+				if(degree(i) == curDeg)
+					result.add(i);
+			}
+			
+			curDeg++;
+		}
+		return result;
 	}
 	
 	public int get(int row, int col) {

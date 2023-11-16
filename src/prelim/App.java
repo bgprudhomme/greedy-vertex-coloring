@@ -7,23 +7,34 @@ public class App {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Matrix m = randGraph(6, 0.5);
-		System.out.println(m);
+		int l = 100;
+		double avgColors;
 		
-		int[] coloring = color_ffd(m);
+		double[] probs = {0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2};
 		
-		System.out.println(Arrays.toString(coloring));
-		System.out.println(legalColoring(m, coloring));
+		for(double p : probs) {
+			avgColors = 0.0;
+			for(int s=0; s<l; s++) {
+				avgColors += (double) color_ff(randBipartiteGraph(500, 500, p, s)) / l;
+			}
+			System.out.println("p = " + p + ", n = 1000: " + avgColors + " avg colors");
+		}
+		
+//		Matrix g = randBipartiteGraph(5, 5, 0.6, 0);
+//		
+//		System.out.println(g);
+//		
+//		System.out.println(color_ffa(g));
 		
 	}
 	
-	public static Matrix randGraph(int n, double p) {
+	public static Matrix randGraph(int n, double p, int seed) {
 		Matrix graph = new Matrix(n);
-		Random rand = new Random();
+		Random rand = new Random(seed);
 		
 		for(int i=0; i<n-1; i++) {
 			for(int j=i+1; j<n; j++) {
-				if(rand.nextFloat() < p) {
+				if(rand.nextDouble() < p) {
 					graph.addEdge(i, j);
 				}
 			}
@@ -32,9 +43,9 @@ public class App {
 		return graph;
 	}
 	
-	public static Matrix randBipartiteGraph(int ka, int kb, double p) {
+	public static Matrix randBipartiteGraph(int ka, int kb, double p, int seed) {
 		Matrix graph = new Matrix(ka+kb);
-		Random rand = new Random();
+		Random rand = new Random(seed);
 		
 		HashSet<Integer> setA = new HashSet<Integer>();
 		for(int i=0; i<ka+kb; i++)
@@ -48,8 +59,8 @@ public class App {
 				setB.add(nextB);
 		}
 		
-		System.out.println("A:" + setA);
-		System.out.println("B:" + setB);
+//		System.out.println(setA);
+//		System.out.println(setB);
 		
 		for(int a : setA) {
 			for(int b : setB) {
@@ -57,7 +68,7 @@ public class App {
 					graph.addEdge(a, b);
 			}
 		}
-		
+				
 		return graph;
 	}
 	
@@ -71,82 +82,113 @@ public class App {
 		return true;
 	}
 	
-	public static int[] color_ff(Matrix graph) {
+	// Fix to consider vertices in alphabetical order
+	public static int color_ff(Matrix graph) {
 		int[] result = new int[graph.size()];
-		Random rand = new Random();
+		int numColors = 0;
 		
-		ArrayList<Integer> uncolored = new ArrayList<Integer>();
-		for(int i=0; i<graph.size(); i++)
-			uncolored.add(i);
-		
-		int i;
 		int nextColor;
 		HashSet<Integer> neighborColors;
-		
-		while(!uncolored.isEmpty()) {
-			i = uncolored.remove(rand.nextInt(uncolored.size()));
+				
+		for(int i=0; i<graph.size(); i++) {
 			
 			neighborColors = new HashSet<Integer>();
+//			System.out.println(degreeSortedNodes.get(i) + "'s neighbors: " + graph.neighbors(degreeSortedNodes.get(i)));
 			for(int j : graph.neighbors(i)) {
 				neighborColors.add(result[j]);
 			}
+			
+//			System.out.println(degreeSortedNodes.get(i) + "'s neighbors' colors: " + neighborColors);
 			
 			nextColor = 1;
 			while(neighborColors.contains(nextColor))
 				nextColor++;
 			
 			result[i] = nextColor;
+			
+//			System.out.println(degreeSortedNodes.get(i) + "'s color: " + nextColor);
+			
+			if(numColors < nextColor)
+				numColors = nextColor;
+			
+//			System.out.println("Coloring array: " + Arrays.toString(result));
 		}
 		
-		return result;
+		return numColors;
 	}
 	
-	public static int[] color_ffa(Matrix graph) {
+	public static int color_ffa(Matrix graph) {
 		int[] result = new int[graph.size()];
-		Random rand = new Random();
+		int numColors = 0;
 		
 		int nextColor;
 		HashSet<Integer> neighborColors;
+		ArrayList<Integer> degreeSortedNodes = graph.degreeSortedNodes();
+		
+//		System.out.println(degreeSortedNodes);
 		
 		for(int i=0; i<graph.size(); i++) {
 			
 			neighborColors = new HashSet<Integer>();
-			for(int j : graph.neighbors(i)) {
+//			System.out.println(degreeSortedNodes.get(i) + "'s neighbors: " + graph.neighbors(degreeSortedNodes.get(i)));
+			for(int j : graph.neighbors(degreeSortedNodes.get(i))) {
 				neighborColors.add(result[j]);
 			}
+			
+//			System.out.println(degreeSortedNodes.get(i) + "'s neighbors' colors: " + neighborColors);
 			
 			nextColor = 1;
 			while(neighborColors.contains(nextColor))
 				nextColor++;
 			
-			result[i] = nextColor;
+			result[degreeSortedNodes.get(i)] = nextColor;
+			
+//			System.out.println(degreeSortedNodes.get(i) + "'s color: " + nextColor);
+			
+			if(numColors < nextColor)
+				numColors = nextColor;
+			
+//			System.out.println("Coloring array: " + Arrays.toString(result));
 		}
 		
-		return result;
+		return numColors;
 	}
 	
-	public static int[] color_ffd(Matrix graph) {
+	public static int color_ffd(Matrix graph) {
 		int[] result = new int[graph.size()];
-		Random rand = new Random();
+		int numColors = 0;
 		
 		int nextColor;
 		HashSet<Integer> neighborColors;
+		ArrayList<Integer> degreeSortedNodes = graph.degreeSortedNodes();
+		
+//		System.out.println(degreeSortedNodes);
 		
 		for(int i=graph.size()-1; i>=0; i--) {
 			
 			neighborColors = new HashSet<Integer>();
-			for(int j : graph.neighbors(i)) {
+//			System.out.println(degreeSortedNodes.get(i) + "'s neighbors: " + graph.neighbors(degreeSortedNodes.get(i)));
+			for(int j : graph.neighbors(degreeSortedNodes.get(i))) {
 				neighborColors.add(result[j]);
 			}
+			
+//			System.out.println(degreeSortedNodes.get(i) + "'s neighbors' colors: " + neighborColors);
 			
 			nextColor = 1;
 			while(neighborColors.contains(nextColor))
 				nextColor++;
 			
-			result[i] = nextColor;
+			result[degreeSortedNodes.get(i)] = nextColor;
+			
+//			System.out.println(degreeSortedNodes.get(i) + "'s color: " + nextColor);
+			
+			if(numColors < nextColor)
+				numColors = nextColor;
+			
+//			System.out.println("Coloring array: " + Arrays.toString(result));
 		}
 		
-		return result;
+		return numColors;
 	}
 	
 }
